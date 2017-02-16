@@ -22,14 +22,8 @@
     <!-- android -->
     <platform name="android">
         <config-file target="res/xml/config.xml" parent="/*">
-            <feature name="TrafficMonitorActivity">
-                <param name="android-package" value="com.maneskul.cordova.traffic.TrafficMonitorActivity"/>
-            </feature>
-			<feature name="TrafficRecord">
-                <param name="android-package" value="com.maneskul.cordova.traffic.TrafficRecord"/>
-            </feature>
-			<feature name="TrafficSnapshot">
-                <param name="android-package" value="com.maneskul.cordova.traffic.TrafficSnapshot"/>
+            <feature name="Traffic">
+                <param name="android-package" value="com.maneskul.cordova.traffic.TrafficPlugin"/>
             </feature>
         </config-file>
         

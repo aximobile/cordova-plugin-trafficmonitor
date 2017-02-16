@@ -3,15 +3,9 @@ var argscheck = require('cordova/argscheck'),
 
 var moduleExport = {};
 
-moduleExport.setOptions = function(options, successCallback, failureCallback) {
-	  if(typeof options === 'object') {
-		  cordova.exec( successCallback, failureCallback, 'SMS', 'setOptions', [options] );
-	  } else {
-		  if(typeof failureCallback === 'function') {
-			  failureCallback('options should be specified.');
-		  }
-	  }
-	};
+moduleExport.listReceived = function(filter, successCallback, failureCallback) {
+	cordova.exec( successCallback, failureCallback, 'Traffic', 'listReceived', [ filter ] );
+};
 
 module.exports = moduleExport;
   
