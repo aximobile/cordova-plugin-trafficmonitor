@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	id="cordova-plugin-trafficmonitor"
+	version="1.0.5">
+      
+    <name>TrafficMonitor</name>
+	<description>Cordova plugin to operate and get traffic of Android</description>
+	<author>Maneskul</author>
+	<license>MIT</license>
+	<keywords>traffic,network</keywords>
+
+	<engines>
+	    <engine name="cordova" version=">=3.0.0" />
+	</engines>
+
+    <js-module src="www/trafficMonitor.js" name="trafficMonitor">
+        <clobbers target="window.trafficMonitor" />
+    </js-module>
+
+    <!-- android -->
+    <platform name="android">
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="TrafficMonitorActivity">
+                <param name="android-package" value="com.maneskul.cordova.traffic.TrafficMonitorActivity"/>
+            </feature>
+			<feature name="TrafficRecord">
+                <param name="android-package" value="com.maneskul.cordova.traffic.TrafficRecord"/>
+            </feature>
+			<feature name="TrafficSnapshot">
+                <param name="android-package" value="com.maneskul.cordova.traffic.TrafficSnapshot"/>
+            </feature>
+        </config-file>
+        
+        <config-file target="AndroidManifest.xml" parent="/*">
+		    <uses-feature android:name="android.hardware.telephony" android:required="false" />
+			<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+		    <uses-permission android:name="android.permission.INTERNET" />
+          </config-file>
+          
+		<source-file src="src/android/TrafficMonitorActivity.java" target-dir="src/com/maneskul/cordova/traffic"/>
+		<source-file src="src/android/TrafficRecord.java" target-dir="src/com/maneskul/cordova/traffic"/>
+		<source-file src="src/android/TrafficSnapshot.java" target-dir="src/com/maneskul/cordova/traffic"/>
+    </platform>
+
+</plugin>
