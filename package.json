@@ -1,0 +1,33 @@
+{
+  "name": "cordova-trafficmonitor",
+  "version": "1.0.1",
+  "description": "Cordova plugin to operate and get traffic of Android",
+  "cordova": {
+    "id": "cordova-plugin-trafficmonitor",
+    "platforms": [
+      "android"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maneskul/cordova-trafficmonitor.git"
+  },
+  "keywords": [
+    "traffic",
+    "network",
+    "ecosystem:cordova",
+    "cordova-android"
+  ],
+  "engines": [
+    {
+      "name": "cordova",
+      "version": ">=3.0.0"
+    }
+  ],
+  "author": "Maneskul",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/maneskul/cordova-trafficmonitor/issues"
+  },
+  "homepage": "https://github.com/maneskul/cordova-trafficmonitor#readme"
+}
