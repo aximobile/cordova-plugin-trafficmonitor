@@ -1,76 +1,130 @@
-/*
-       Licensed to the Apache Software Foundation (ASF) under one
-       or more contributor license agreements.  See the NOTICE file
-       distributed with this work for additional information
-       regarding copyright ownership.  The ASF licenses this file
-       to you under the Apache License, Version 2.0 (the
-       "License"); you may not use this file except in compliance
-       with the License.  You may obtain a copy of the License at
+package com.maneskul.cordova.trafficmonitor;
 
-         http://www.apache.org/licenses/LICENSE-2.0
+import android.app.Fragment;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.net.TrafficStats;
 
-       Unless required by applicable law or agreed to in writing,
-       software distributed under the License is distributed on an
-       "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-       KIND, either express or implied.  See the License for the
-       specific language governing permissions and limitations
-       under the License.
-*/
-
-package com.maneskul.cordova.traffic;
-
-import org.apache.cordova.CordovaPlugin;
-import org.apache.cordova.ConfigXmlParser;
-import org.apache.cordova.LOG;
-import org.apache.cordova.Whitelist;
-import org.xmlpull.v1.XmlPullParser;
-
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.database.ContentObserver;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Handler;
+import android.telephony.SmsManager;
+import android.telephony.SmsMessage;
+import android.telephony.PhoneNumberUtils;
+import android.util.Log;
 
-public class TrafficPlugin extends CordovaPlugin {
-    private static final String LOG_TAG = "TrafficPlugin";
+import java.util.List;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
-    // Used when instantiated via reflection by PluginManager
-    public TrafficPlugin() {
+import org.apache.cordova.CallbackContext;
+import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.PluginResult;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+public class TrafficPlugin
+extends CordovaPlugin {
+    private static final String LOGTAG = "TrafficPlugin";
+	private static final String ACTION_LIST_TRAFFIC = "showStats";
+
+    public boolean execute(String action, JSONArray inputs, CallbackContext callbackContext) throws JSONException {
+        PluginResult result = null;
+        if (ACTION_LIST_TRAFFIC.equals(action)) {
+            JSONObject filters = inputs.optJSONObject(0);
+            result = this.showStats(callbackContext);
+        } else {
+            Log.d(LOGTAG, String.format("Invalid action passed: %s", action));
+            result = new PluginResult(PluginResult.Status.INVALID_ACTION);
+        }
+        if (result != null) {
+            callbackContext.sendPluginResult(result);
+        }
+        return true;
     }
-   	
-    @Override
-    public void pluginInitialize() {
-        if (allowedNavigations == null) {
-            allowedNavigations = new Whitelist();
-            allowedIntents = new Whitelist();
-            allowedRequests = new Whitelist();
-            new CustomConfigXmlParser().parse(webView.getContext());
+
+    public void onDestroy() {
+    }
+
+    public void setOptions(JSONObject options) {
+    }
+
+    protected String __getProductShortName() {
+        return "Traffic";
+    }
+
+    public final String md5(String s) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("MD5");
+            digest.update(s.getBytes());
+            byte[] messageDigest = digest.digest();
+            StringBuffer hexString = new StringBuffer();
+            for (int i = 0; i < messageDigest.length; ++i) {
+                String h = Integer.toHexString(255 & messageDigest[i]);
+                while (h.length() < 2) {
+                    h = "0" + h;
+                }
+                hexString.append(h);
+            }
+            return hexString.toString();
+        }
+        catch (NoSuchAlgorithmException digest) {
+            return "";
         }
     }
+	
+	private PluginResult showStats(CallbackContext callbackContext) {
+        Log.i(LOGTAG, ACTION_LIST_TRAFFIC);
+		JSONArray jsons = new JSONArray();
+		
+		PackageManager pm = this.cordova.getActivity().getPackageManager();
+        List<ApplicationInfo> packages = pm.getInstalledApplications(0);
 
-    public String getTimeZoneID() {
-		TimeZone tz = TimeZone.getDefault();
-        return (tz.getID());
+        for (ApplicationInfo packageInfo : packages) {
+            // get the UID for the selected app
+			
+            int UID = packageInfo.uid;
+            String package_name = packageInfo.packageName;
+            ApplicationInfo app = null;
+            try {
+                app = pm.getApplicationInfo(package_name, 0);
+            } catch (PackageManager.NameNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            String name = (String) pm.getApplicationLabel(app);
+            double received = (double) TrafficStats.getUidRxBytes(UID) / (1024 * 1024);
+            double send = (double) TrafficStats.getUidTxBytes(UID) / (1024 * 1024);
+            double total = received + send;
+			
+			if (total > 0) {
+				try {
+					JSONObject json = new JSONObject();
+					json.put("uid", UID);
+					json.put("name", name);
+					json.put("received", received);
+					json.put("send", send);
+					json.put("total", total);
+					jsons.put((Object)json);
+				} catch ( Exception e ) { 
+					e.printStackTrace(); 
+				}
+			}
+        }
+		
+        callbackContext.success(jsons);
+        return null;
     }
-	
-	public PluginResult listReceived(CallbackContext callbackContext) {
-		ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-		List<RunningAppProcessInfo> runningApps = manager.getRunningAppProcesses();
-		JSONObject json = new JSONArray();
-		
-		for (RunningAppProcessInfo runningApp : runningApps) {
-		  JSONObject json = new JSONObject();
-		  
-		  // Get UID of the selected process
-		  int uid = ((RunningAppProcessInfo)getListAdapter().getItem(position)).uid;
-		  // Get traffic data
-		  long received = TrafficStats.getUidRxBytes(uid);
-		  long send   = TrafficStats.getUidTxBytes(uid);
-		  json.put("uid", uid);
-		  json.put("received", received);
-		  json.put("send", send);
-		  
-		  jsons.put((Object)json);
-		}
-		
-		callbackContext.success(jsons);
-	}
-	
-	
 }
