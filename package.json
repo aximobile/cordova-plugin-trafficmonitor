@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugins-trafficmonitor",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Cordova plugin to operate and get TrafficStats of Android",
   "cordova": {
     "id": "cordova-plugins-trafficmonitor",
