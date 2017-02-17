@@ -33,7 +33,7 @@
 		    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
           </config-file>
           
-		<source-file src="src/android/SMSPlugin.java" target-dir="src/com/rjfun/cordova/sms"/>
+		<source-file src="TrafficPlugin.java" target-dir="src/com/maneskul/cordova/trafficmonitor"/>
     </platform>
 
 </plugin>
