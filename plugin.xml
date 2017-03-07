@@ -3,7 +3,7 @@
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	id="cordova-plugin-trafficmonitor"
-	version="1.1.1">
+	version="1.1.2">
       
     <name>Traffic Monitor</name>
 	<description>Cordova plugin to operate and get TrafficStats of Android</description>
@@ -33,7 +33,7 @@
 		    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
           </config-file>
           
-		<source-file src="TrafficPlugin.java" target-dir="src/com/maneskul/cordova/trafficmonitor"/>
+		<source-file src="src/android/TrafficPlugin.java" target-dir="src/com/maneskul/cordova/trafficmonitor"/>
     </platform>
 
 </plugin>
